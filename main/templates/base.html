@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body>
+    <main class="main-wrapper">
+      <section class="title-wrapper">{% block title %} {% endblock %}</section>
+      <section class="content-wrapper">
+        {% block content %} {% endblock %}
+      </section>
+      <footer>
+        <nav class="link-wrapper footer-nav">
+          <a href="/generator" class="nav-link link" k>Generator</a>
+          <a href="/vault" class="nav-link link">Vault</a>
+          <a href="{% url 'logout' %}" class="nav-link link">{% if user.is_authenticated %}Logout{% else %}Login{% endif %}</a
+          >
+        </nav>
+        <p class="separator">|</p>
+        <p class="copyright-text">&copy PRIVISA 2022</p>
+      </footer>
+    </main>
+    <script>
+      let a = document.querySelectorAll(".footer-nav .nav-link");
+      a.forEach((elem) => {
+        if (elem.textContent == "{{title}}") {
+          elem.classList.add("active");
+        }
+      });
+    </script>
+  </body>
+</html>

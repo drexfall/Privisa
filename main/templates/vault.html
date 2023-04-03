@@ -1,0 +1,101 @@
+{% extends 'base.html' %} {% block title %}
+<h1>Vault</h1>
+<sub>Store your deepest secrets</sub>
+{% endblock %} {% block content %} {% if user.is_authenticated %}
+<div class="vault-table">
+  {% for row in userdata %}
+  <div class="vault-row" id="row{{row.id}}">
+    <a class="link" href="{{row.website}}" target="_self">{{row.website}}</a>
+    <input
+      class="stored-username"
+      type="text"
+      value="{{row.username}}"
+      name="username"
+      disabled
+    />
+    <input
+      class="stored-password"
+      type="password"
+      value="{{row.password}}"
+      name="password"
+      disabled
+    />
+    <div class="button-container">
+      <button class="material-symbols-outlined" onclick="passToggle(this)">
+        visibility
+      </button>
+      <button
+        class="material-symbols-outlined"
+        onclick="editPass(this)"
+        id="{{row.id}}"
+      >
+        edit
+      </button>
+      <a href="{% url 'vault' row.id %}">
+        <button class="material-symbols-outlined" id="{{row.id}}">
+          delete
+        </button>
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<form id="entryForm" action="" method="post">
+  {{form}}
+  <div class="button-container">
+    <button
+      type="button"
+      class="material-symbols-outlined"
+      onclick="passToggle(this,true)"
+    >
+      visibility
+    </button>
+    <button type="submit" class="material-symbols-outlined">done</button>
+  </div>
+</form>
+{% else %}
+<h2>Can you login please?</h2>
+{% endif %}
+<script>
+  function passToggle(button, form = false) {
+    let passInput;
+    if (form) {
+      passInput = document.querySelector("#id_password");
+    } else {
+      passInput =
+        button.parentElement.parentElement.querySelector(".stored-password");
+    }
+    if (passInput.getAttribute("type") == "text") {
+      button.textContent = "visibility";
+      passInput.setAttribute("type", "password");
+    } else {
+      button.textContent = "visibility_off";
+      passInput.setAttribute("type", "text");
+    }
+  }
+  function editPass(button) {
+    let passUser =
+      button.parentElement.parentElement.querySelector(".stored-username");
+    let passInput =
+      button.parentElement.parentElement.querySelector(".stored-password");
+    if (passInput.disabled) {
+      passInput.disabled = false;
+      passUser.disabled = false;
+      button.textContent = "done";
+    } else {
+      passInput.disabled = true;
+      passUser.disabled = true;
+      button.textContent = "edit";
+      console.log(button.id);
+      location.href = `/vault/update=${button.id}+${passUser.value}+${passInput.value}`;
+    }
+  }
+
+  document.querySelectorAll(".vault-row .link").forEach((elem) => {
+    console.log(elem.href)
+    if (!elem.textContent.match(/^http[s]{0,1}:/)) {
+      elem.href = "https:" + elem.textContent;
+    }
+  });
+</script>
+{% endblock %}

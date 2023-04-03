@@ -1,0 +1,16 @@
+{% extends 'base.html' %} {% block title %}
+<h1>Privisa</h1>
+<sub>Password Manager</sub>
+{% endblock %} {% block content %}
+ {% if user.password %}
+<h2>Login</h2>
+{% else %}
+<h2>Register</h2>
+{% endif %}
+<form action="" method="post">
+  {{ form }}
+  <button type="submit" class="button">Login</button>
+</form>
+{% if form.bad_password %}
+<p>The password is incorrect</p>
+{% endif %} {% endblock %}

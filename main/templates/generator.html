@@ -1,0 +1,23 @@
+{% extends 'base.html' %} {% block title %}
+<h1>Generator</h1>
+<sub>Generate random passwords</sub>
+{% endblock %} {% block content %}
+<div>
+  <p class="generated-text">{{password}}</p>
+  <form class="generator-form" action="" method="post">
+    {{form}}
+   <div class="button-container">
+    <button class="material-symbols-outlined" type="button" onclick="copyText()" title="Copy Password">content_copy</button>
+    <button id="submitButton" class="material-symbols-outlined" type="submit" title="Generate Password">refresh</button>
+   </div>
+  </form>
+</div>
+
+<script>
+  function copyText(){
+    let text = document.querySelector(".generated-text").textContent
+    navigator.clipboard.writeText(text);
+    alert("Content Copied!")
+  };
+</script>
+{% endblock %}
