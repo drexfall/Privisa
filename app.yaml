@@ -2,7 +2,7 @@
 
 runtime: python311
 env: standard
-entrypoint: gunicorn -b :$PORT core.wsgi:application
+entrypoint: gunicorn -b :$PORT PasswordManager.wsgi:application
 
 handlers:
 - url: /.*
