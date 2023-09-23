@@ -1,0 +1,20 @@
+# .gcloudignore
+
+.gcloudignore
+
+
+
+# Python pycache:
+__pycache__/
+
+# Ignore collected static and media files
+mediafiles/
+staticfiles/
+
+
+# Ignored by the build system
+/setup.cfg
+venv/
+
+# Ignore IDE files
+.idea/
