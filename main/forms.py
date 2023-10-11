@@ -2,18 +2,43 @@ from django import forms
 from .models import User, PasswordEntry, GeneratorSettings
 
 
+class Register(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ['email','username','password']
+
+    def __init__(self, *args, **kwargs):
+        super(Register, self).__init__(*args, **kwargs)
+
+        self.fields['email'].label = ""
+        self.fields['email'].widget = forms.EmailInput(
+            attrs={'placeholder': 'email address', 'autofocus': 'autofocus'})
+        
+        self.fields['username'].label = ""
+        self.fields['username'].widget = forms.PasswordInput(
+            attrs={'placeholder': 'username'})
+        
+        self.fields['password'].label = ""
+        self.fields['password'].widget = forms.PasswordInput(
+            attrs={'placeholder': 'password'})
+
 class Login(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['password']
+        fields = ['username','password']
 
     def __init__(self, *args, **kwargs):
         super(Login, self).__init__(*args, **kwargs)
 
+        self.fields['username'].label = ""
+        self.fields['username'].widget = forms.PasswordInput(
+            attrs={'placeholder': 'username'})
+        
         self.fields['password'].label = ""
         self.fields['password'].widget = forms.PasswordInput(
-            attrs={'placeholder': 'Enter password'})
+            attrs={'placeholder': 'password'})
 
 
 class PasswordInput(forms.ModelForm):

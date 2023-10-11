@@ -1,56 +1,66 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import User, PasswordEntry, GeneratorSettings
-from .forms import Login, PasswordInput, SettingsForm
+from .forms import Login, PasswordInput, SettingsForm, Register
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic.edit import DeleteView
 from .generate import Generator
+from django.contrib.auth.hashers import make_password, check_password
 
 # Create your views here.
 
 
-def index(request, logout=False):
-    form = Login()
-    user = User.objects.all().values()
-    if user and user[0]['is_authenticated']:
-        return HttpResponseRedirect('/vault')
+def register(request, logout=False):
+    user = request.user
+    form = Register()
+    
+    if request.method == 'POST':
+        form = Register(request.POST)
+        if form.is_valid():
+            f = form
+            # f = form.save(commit=False)
+            # f.password = make_password(f.password)
+            f.save()
+            return HttpResponseRedirect('/vault')
 
+    context = {'title': "Register", 'form': form, "user": user}
+    return render(request, 'authenticate.html', context)
+def login(request, logout=False):
+    user = 'anonymous'
+    form = Login()
+    
     if request.method == 'POST':
         form = Login(request.POST)
         if form.is_valid():
-            if not user:
-                form.save()
-                return HttpResponseRedirect('/vault')
-            if not user[0]['password']:
-                user[0]['password'] = form.cleaned_data['password']
-
-            if form.cleaned_data['password'] == user[0]['password']:
-                form.bad_password = False
-                user_authen = User.objects.get(id=1)
-
-                user_authen.is_authenticated = True
-                user_authen.save()
-                return HttpResponseRedirect('/vault')
-            else:
-                form.bad_password = True
-                user_authen = User.objects.get(id=1)
-                user_authen.is_authenticated = False
-                user_authen.save()
-    context = {'title': "Login", 'form': form, 'user': user[0] if user else []}
-    return render(request, 'index.html', context)
-
+            if User.objects.filter(username=form.cleaned_data["username"]).exists():
+                user = User.objects.get(username=form.cleaned_data["username"])
+                
+                if form.cleaned_data["password"] == user.password:
+                # if check_password(form.cleaned_data["password"], user.password):
+                    user.is_authenticated = True
+                    user.save()
+                    request.user = user
+                    return redirect('vault')
+                
+    context = {'title': "Login", 'form': form, 'user': user}
+    return render(request, 'authenticate.html', context)
 
 def logout(request):
-    if not User.objects.all():
-        User(password="", is_authenticated=False).save()
-    user_authen = User.objects.get(id=1)
-    user_authen.is_authenticated = False
-    user_authen.save()
-    return HttpResponseRedirect('/')
-
+    if User.objects.filter(is_authenticated=True).exists():
+        user = User.objects.get(is_authenticated=True)
+        user.is_authenticated = False
+        user.save()
+        
+        return redirect("home")
+    else:
+        return redirect("vault")
+        
 
 def vault(request):
-    user_data = User.objects.all().values()
+    if User.objects.filter(is_authenticated=True).exists():
+        user = User.objects.get(is_authenticated=True)
+    else:
+        user = "anonymous"
     pass_entry_data = PasswordEntry.objects.all().values()
 
     if request.method == 'POST':
@@ -67,8 +77,7 @@ def vault(request):
     else:
         form = PasswordInput()
 
-    context = {'title': "Vault", 'user': user_data[0] if user_data else [
-    ], 'userdata': pass_entry_data, "form": form}
+    context = {'title': "Vault", 'user': user, 'userdata': pass_entry_data, "form": form}
     return render(request, 'vault.html', context)
 
 

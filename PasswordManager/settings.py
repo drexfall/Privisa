@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import environ
 from urllib.parse import urlparse
+from google.oauth2 import service_account
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -82,8 +83,13 @@ WSGI_APPLICATION = 'PasswordManager.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'PASSWORD':"tyO4ESikkccPC9JB44n6",
+        "USER": "privisa_admin",
+        "HOST": "privisadb.cdog4opxowng.ap-south-1.rds.amazonaws.com",
+        "PORT": "5432",
+        
     }
 }
 
@@ -144,3 +150,11 @@ if APPENGINE_URL:
     SECURE_SSL_REDIRECT = True
 else:
     ALLOWED_HOSTS = ['*']
+    
+GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+    os.path.join(BASE_DIR, 'gcpCredentials.json')
+)
+
+DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+GS_BUCKET_NAME = env('GS_BUCKET_NAME')

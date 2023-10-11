@@ -5,6 +5,10 @@ env: standard
 entrypoint: gunicorn -b :$PORT PasswordManager.wsgi:application
 
 handlers:
+- url: /static              # new
+  static_dir: static/  # new
+- url: /media               # new
+  static_dir: media/   # new
 - url: /.*
   script: auto
 
